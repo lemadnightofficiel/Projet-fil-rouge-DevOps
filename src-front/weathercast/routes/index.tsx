@@ -1,33 +1,64 @@
-import { useSignal } from "@preact/signals";
-import { Head } from "fresh/runtime";
-import { define } from "../utils.ts";
-import Counter from "../islands/Counter.tsx";
+import { config } from '../config.ts';
 
-export default define.page(function Home(ctx) {
-  const count = useSignal(3);
+type WeatherForecast = {
+  date: string;
+  temperatureC: number;
+  temperatureF: number;
+  summary: string | null;
+};
 
-  console.log("Shared value " + ctx.state.shared);
+const API_URL = config.apiulr;
+
+export default async function Home() {
+  let data: WeatherForecast[] = [];
+  let errorMessage = "";
+
+  try {
+    const res = await fetch(API_URL);
+
+    if (!res.ok) {
+      errorMessage = `API indisponible (${res.status} ${res.statusText})`;
+    } else {
+      data = (await res.json()) as WeatherForecast[];
+    }
+  } catch {
+    errorMessage = "Impossible de joindre l’API.";
+  }
 
   return (
-    <div class="px-4 py-8 mx-auto fresh-gradient min-h-screen">
-      <Head>
-        <title>Fresh counter</title>
-      </Head>
-      <div class="max-w-screen-md mx-auto flex flex-col items-center justify-center">
-        <img
-          class="my-6"
-          src="/logo.svg"
-          width="128"
-          height="128"
-          alt="the Fresh logo: a sliced lemon dripping with juice"
-        />
-        <h1 class="text-4xl font-bold">Welcome to Fresh</h1>
-        <p class="my-4">
-          Try updating this message in the
-          <code class="mx-2">./routes/index.tsx</code> file, and refresh.
+    <main style={{ padding: "2rem", fontFamily: "system-ui" }}>
+      <h1>Weather Forecast</h1>
+
+      {errorMessage && (
+        <p style={{ color: "crimson", marginBottom: "1rem" }}>
+          {errorMessage}
         </p>
-        <Counter count={count} />
-      </div>
-    </div>
+      )}
+
+      {data.length === 0 ? (
+        <p>Aucune donnée disponible pour le moment.</p>
+      ) : (
+        <table border={1} cellPadding={10} style={{ borderCollapse: "collapse" }}>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Température C</th>
+              <th>Température F</th>
+              <th>Résumé</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((item) => (
+              <tr key={item.date}>
+                <td>{new Date(item.date).toLocaleDateString("fr-FR")}</td>
+                <td>{item.temperatureC}</td>
+                <td>{item.temperatureF}</td>
+                <td>{item.summary ?? "-"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </main>
   );
-});
+}

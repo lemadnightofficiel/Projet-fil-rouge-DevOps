@@ -8,10 +8,24 @@ Started" guide here: https://fresh.deno.dev/docs/getting-started
 Make sure to install Deno:
 https://docs.deno.com/runtime/getting_started/installation
 
+Make shure you have create the config.ts in the same folder as main.ts,
+inside set the apiulr config with your api url.
+```
+export const config = {
+    apiulr: "https://your_weather_api",
+} satisfies Record<string, unknown>;
+```
+
 Then start the project in development mode:
 
 ```
 deno task dev
+```
+
+To deploy the projet:
+
+```
+deno task build
 ```
 
 This will watch the project directory and restart as necessary.
