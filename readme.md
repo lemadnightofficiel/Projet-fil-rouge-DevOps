@@ -60,7 +60,7 @@ L'utilisateur saisit une localisation et obtient les conditions météo en temps
 
 ```
 ┌─────────────┐       ┌─────────────────┐       ┌──────────────┐
-│  Frontend   │──────▶│   API C# (.NET) │──────▶│   MariaDB    │
+│  Frontend   │─────▶│   API C# (.NET)  │─────▶│   MariaDB    │
 │    Deno     │       │   /api/weather  │       │  (données)   │
 │  :3000      │       │   :8080         │       │  :3306       │
 └─────────────┘       └────────┬────────┘       └──────────────┘
@@ -93,20 +93,6 @@ Accès :
 - Frontend : http://localhost:3000
 - API : http://localhost:8080
 - Health check : http://localhost:8080/health
-
----
-
-## Variables d'environnement
-
-| Variable | Description | Exemple |
-| -------- | ----------- | ------- |
-| `OPENWEATHER_API_KEY` | Clé API OpenWeatherMap | `abc123...` |
-| `DB_HOST` | Hôte MariaDB | `db` |
-| `DB_NAME` | Nom de la base | `meteo` |
-| `DB_USER` | Utilisateur DB | `meteouser` |
-| `DB_PASSWORD` | Mot de passe DB | *(secret)* |
-
-> ⚠️ Ne jamais committer le fichier `.env` — il est dans le `.gitignore`.
 
 ---
 
