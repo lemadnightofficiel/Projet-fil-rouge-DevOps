@@ -1,5 +1,4 @@
 services:
-
   # ─── BASE DE DONNÉES ───────────────────────────────────────────
   db:
     build:
@@ -17,14 +16,6 @@ services:
       - ./bdd/data:/docker-entrypoint-initdb.d:ro
     networks:
       - backend
-    ports:
-      - "9853:3306"
-    healthcheck:
-      test: ["CMD", "mariadb-admin", "ping", "-h", "localhost", "--silent"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
 
   # ─── API ───────────────────────────────────────────────────────
   api:
@@ -32,8 +23,10 @@ services:
       context: ./src-api
     container_name: api
     restart: unless-stopped
+    env_file: .env
     environment:
-      ASPNETCORE_URLS: http://0.0.0.0:8080
+      ASPNETCORE_URLS: http://0.0.0.0:8080/
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Production}
       ConnectionStrings__MariaDbConnectionString: ${MARIADB_CONNECTIONSTRING}
     ports:
       - "3120:8080"
@@ -41,8 +34,7 @@ services:
       - backend
       - frontend
     depends_on:
-      db:
-        condition: service_healthy
+      - db
 
   # ─── FRONT ─────────────────────────────────────────────────────
   front:
@@ -53,7 +45,7 @@ services:
     container_name: front
     restart: unless-stopped
     environment:
-      API_URL: http://localhost:8080/api/weathers
+      API_URL: http://api:8080/api/weathers
     ports:
       - "5057:8000"
     networks:
@@ -66,4 +58,6 @@ volumes:
 
 networks:
   backend:
+    driver: bridge
   frontend:
+    driver: bridge

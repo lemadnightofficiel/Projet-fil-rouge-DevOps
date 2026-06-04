@@ -7,5 +7,5 @@ COPY data/init.sh /docker-entrypoint-initdb.d/
 
 VOLUME /var/lib/mysql
 
-HEALTHCHECK --interval=10s --timeout=5s --start-period=30s --retries=3 \
-  CMD healthcheck.sh --connect --innodb_initialized || exit 1
+HEALTHCHECK --interval=10s --timeout=5s --start-period=60s --retries=10 \
+  CMD mariadb-admin ping -h localhost --silent || exit 1
