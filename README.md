@@ -63,13 +63,7 @@ L'utilisateur saisit une localisation et obtient les conditions météo en temps
 │  Frontend   │─────▶│   API C# (.NET)  │─────▶│   MariaDB    │
 │    Deno     │       │   /api/weather  │       │  (données)   │
 │  :3000      │       │   :8080         │       │  :3306       │
-└─────────────┘       └────────┬────────┘       └──────────────┘
-                               │
-                               ▼
-                    ┌──────────────────────┐
-                    │  OpenWeatherMap API  │
-                    │  (externe)           │
-                    └──────────────────────┘
+└─────────────┘       └─────────────────┘       └──────────────┘
 ```
 
 ---
@@ -83,17 +77,16 @@ cd Projet-fil-rouge-DevOps
 
 # Copier et remplir les variables d'environnement
 cp .env.example .env
-# Renseigner OPENWEATHER_API_KEY, DB_PASSWORD, etc.
+# Renseigner DB_PASSWORD, etc.
 
 # Lancer l'ensemble
-docker compose up --build
+docker compose up --build -d
 ```
 
 Accès :
-- Frontend : http://localhost:3000
-- API : http://localhost:8080
-- Health check : http://localhost:8080/health
-
+- Frontend : http://localhost:5057
+- API : http://localhost:3120
+  
 ---
 
 ## Structure du dépôt
