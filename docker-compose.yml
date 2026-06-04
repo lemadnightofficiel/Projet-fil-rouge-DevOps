@@ -1,0 +1,71 @@
+services:
+
+  # ─── BASE DE DONNÉES ───────────────────────────────────────────
+  db:
+    build:
+      context: ./bdd
+    container_name: bdd
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASENAME}
+      MYSQL_USER: ${MYSQL_USERNAME}
+      MYSQL_PASSWORD: ${MYSQL_USER_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./bdd/data:/docker-entrypoint-initdb.d:ro
+    networks:
+      - backend
+    ports:
+      - "9853:3306"
+    healthcheck:
+      disable: true
+    # healthcheck:
+    #   test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p'${MYSQL_ROOT_PASSWORD}'" ]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 5
+    #   start_period: 30s
+
+  # ─── API ───────────────────────────────────────────────────────
+  api:
+    build:
+      context: ./src-api
+    container_name: api
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_URLS: http://0.0.0.0:8080
+      ConnectionStrings__MariaDbConnectionString: ${MARIADB_CONNECTIONSTRING}
+    ports:
+      - "3120:8080"
+    networks:
+      - backend
+      - frontend
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # ─── FRONT ─────────────────────────────────────────────────────
+  front:
+    build:
+      context: ./src-front/weathercast
+      args:
+        GIT_REVISION: ${GIT_REVISION:-dev}
+    container_name: front
+    restart: unless-stopped
+    environment:
+      API_URL: http://api:3120
+    ports:
+      - "5057:8000"
+    networks:
+      - frontend
+    depends_on:
+      - api
+
+volumes:
+  db_data:
+
+networks:
+  backend:
+  frontend:

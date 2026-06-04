@@ -1,18 +1,20 @@
-using System.Data;
 using ProjetDevOps.Controllers;
 using ProjetDevOps.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 var connectionString = builder.Configuration.GetConnectionString("MariaDbConnectionString");
-if (string.IsNullOrEmpty(connectionString))
-{
-    throw new NoNullAllowedException(nameof(connectionString));
-}
+//if (string.IsNullOrEmpty(connectionString))
+//{
+//    throw new NoNullAllowedException(nameof(connectionString));
+//}
 
-builder.Services.AddSingleton<WeatherRepository>();
+builder.Services.AddControllers();
+
+
 
 builder.Services.AddCors(options =>
 {
@@ -25,21 +27,21 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddOpenApi();
+builder.Services.AddDbContext<WeatherDbContext>(options =>
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+
+var provider = builder.Services.BuildServiceProvider();
+var context = provider.GetService<WeatherDbContext>();
+
+
+
+builder.Services.AddScoped<WeatherRepository>();
 
 var app = builder.Build();
 
 app.AddWeatherEndpoint();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
-
 app.UseHttpsRedirection();
-
-app.UseAuthorization();
 
 app.MapControllers();
 

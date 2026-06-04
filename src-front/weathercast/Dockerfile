@@ -1,4 +1,4 @@
-FROM denoland/deno:bin-2.2.4
+FROM denoland/deno:2.4.2
 
 ARG GIT_REVISION
 ENV DENO_DEPLOYMENT_ID=${GIT_REVISION}
@@ -12,6 +12,7 @@ RUN deno install
 
 COPY . .
 
+RUN deno install --node-modules-dir=auto --allow-scripts=npm:rollup,npm:vite,npm:esbuild
 RUN deno task build
 
 RUN deno cache _fresh/server.js
