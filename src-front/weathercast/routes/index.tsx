@@ -3,6 +3,8 @@ import { config } from '../config.ts';
 type WeatherForecast = {
   date: string;
   temperatureC: number;
+  town : string;
+  postalCode : string
   temperatureF: number;
   summary: string | null;
 };
@@ -52,6 +54,8 @@ export default async function Home() {
               <tr key={item.date}>
                 <td>{new Date(item.date).toLocaleDateString("fr-FR")}</td>
                 <td>{item.temperatureC}</td>
+                <td>{item.town}</td>
+                <td>{item.postalCode}</td>
                 <td>{item.temperatureF}</td>
                 <td>{item.summary ?? "-"}</td>
               </tr>
