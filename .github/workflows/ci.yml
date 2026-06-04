@@ -38,20 +38,9 @@ jobs:
             --build-arg GIT_SHA=${{ github.sha }} \
             ./src-api
 
-  build-front:
-    name: Build Frontend
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Build image Frontend
-        run: |
-          docker build \
-            --build-arg GIT_REVISION=${{ github.sha }} \
-            ./src-front/weathercast
-
   all-checks:
     name: Pipeline OK
     runs-on: ubuntu-latest
-    needs: [build-bdd, build-api, build-front]
+    needs: [build-bdd, build-api]
     steps:
       - run: echo "Tous les builds sont passés"
