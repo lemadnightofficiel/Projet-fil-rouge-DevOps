@@ -23,9 +23,13 @@ deno task dev
 ```
 
 To deploy the projet:
-
+You need to have docket instaled.
 ```
-deno task build
+//build docker image
+docker build --build-arg GIT_REVISION=$(git rev-parse HEAD) -t my-fresh-app .
+
+//launch contener
+docker run -t -i -p 80:8000 my-fresh-app
 ```
 
 This will watch the project directory and restart as necessary.
