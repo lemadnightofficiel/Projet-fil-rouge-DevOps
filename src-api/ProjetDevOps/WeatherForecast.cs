@@ -14,7 +14,7 @@ public class WeatherForecast
     public int TemperatureC { get; set; }
 
     public string Town { get; set; }
-    
+
     public string PostalCode { get; set; }
 
     public string? Summary { get; set; }
