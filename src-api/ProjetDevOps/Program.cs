@@ -30,11 +30,6 @@ builder.Services.AddCors(options =>
 builder.Services.AddDbContext<WeatherDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
-var provider = builder.Services.BuildServiceProvider();
-var context = provider.GetService<WeatherDbContext>();
-
-
-
 builder.Services.AddScoped<WeatherRepository>();
 
 var app = builder.Build();
