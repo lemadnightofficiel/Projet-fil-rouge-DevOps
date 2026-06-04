@@ -12,6 +12,8 @@ USE ${MYSQL_DATABASENAME};
 CREATE TABLE WeatherForecasts (
     idWeather VARCHAR(255) NOT NULL PRIMARY KEY,
     Date DATETIME NOT NULL,
+    Town VARCHAR(255) NOT NULL,
+    PostalCode VARCHAR(5) NOT NULL,
     TemperatureC INTEGER NOT NULL,
     Summary VARCHAR(255)
 );
