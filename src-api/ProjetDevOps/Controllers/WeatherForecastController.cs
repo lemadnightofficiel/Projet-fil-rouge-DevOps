@@ -21,6 +21,18 @@ public static class WeatherForecastController
             .Produces<WeatherForecast>((int)HttpStatusCode.OK, MediaTypeNames.Application.Json)
             .WithName(nameof(GetWeather));
 
+        builder.MapPost("/api/weather", InsertWeather)
+            .WithName(nameof(InsertWeather));
+
         return builder;
+    }
+
+    public static async Task<IResult> InsertWeather(
+        [FromBody] WeatherForecast weather,
+        [FromServices] WeatherRepository repository)
+    {
+        await repository.InsertAllWeather(weather);
+
+        return Results.Created();
     }
 }

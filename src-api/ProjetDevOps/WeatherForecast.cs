@@ -1,16 +1,21 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace ProjetDevOps;
 
 public class WeatherForecast
 {
-    public DateOnly Date { get; set; }
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    [Key]
+    public Guid IdWeather { get; set; } = Guid.NewGuid();
+
+    public DateTime Date { get; set; }
 
     public int TemperatureC { get; set; }
 
     public string Town {get;set;}
     
     public string PostalCode {get;set;}
-
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
 
     public string? Summary { get; set; }
 }

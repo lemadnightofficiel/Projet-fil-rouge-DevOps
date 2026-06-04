@@ -5,7 +5,6 @@ type WeatherForecast = {
   temperatureC: number;
   town : string;
   postalCode : string
-  temperatureF: number;
   summary: string | null;
 };
 
@@ -16,14 +15,17 @@ export default async function Home() {
   let errorMessage = "";
 
   try {
+    console.log(API_URL);
     const res = await fetch(API_URL);
 
     if (!res.ok) {
       errorMessage = `API indisponible (${res.status} ${res.statusText})`;
+      console.log(errorMessage);
     } else {
       data = (await res.json()) as WeatherForecast[];
     }
-  } catch {
+  } catch (e) {
+    console.log(e)
     errorMessage = "Impossible de joindre l’API.";
   }
 
@@ -45,7 +47,8 @@ export default async function Home() {
             <tr>
               <th>Date</th>
               <th>Température C</th>
-              <th>Température F</th>
+              <th>Ville</th>
+              <th>Code Postal</th>
               <th>Résumé</th>
             </tr>
           </thead>
@@ -56,7 +59,6 @@ export default async function Home() {
                 <td>{item.temperatureC}</td>
                 <td>{item.town}</td>
                 <td>{item.postalCode}</td>
-                <td>{item.temperatureF}</td>
                 <td>{item.summary ?? "-"}</td>
               </tr>
             ))}

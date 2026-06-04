@@ -20,13 +20,11 @@ services:
     ports:
       - "9853:3306"
     healthcheck:
-      disable: true
-    # healthcheck:
-    #   test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p'${MYSQL_ROOT_PASSWORD}'" ]
-    #   interval: 10s
-    #   timeout: 5s
-    #   retries: 5
-    #   start_period: 30s
+      test: ["CMD", "mariadb-admin", "ping", "-h", "localhost", "--silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   # ─── API ───────────────────────────────────────────────────────
   api:
@@ -55,7 +53,7 @@ services:
     container_name: front
     restart: unless-stopped
     environment:
-      API_URL: http://api:3120
+      API_URL: http://localhost:8080/api/weathers
     ports:
       - "5057:8000"
     networks:
