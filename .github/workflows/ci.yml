@@ -46,29 +46,10 @@ jobs:
           tags: ghcr.io/${{ github.repository_owner }}/api:${{ github.sha }}
           build-args: GIT_SHA=${{ github.sha }}
 
-  build-and-push-front:
-    name: Build and Push Front
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Login GHCR
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and Push image Front
-        uses: docker/build-push-action@v6
-        with:
-          context: ./src-front/weathercast
-          push: ${{ github.ref == 'refs/heads/main' }}
-          tags: ghcr.io/${{ github.repository_owner }}/front:${{ github.sha }}
-          build-args: GIT_REVISION=${{ github.sha }}
-
   integration:
     name: Docker Compose Up and Tests
     runs-on: ubuntu-latest
-    needs: [build-bdd, build-and-push-api, build-and-push-front]
+    needs: [build-bdd, build-and-push-api]
     env:
       MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
       MYSQL_DATABASENAME: ${{ secrets.MYSQL_DATABASENAME }}
@@ -89,7 +70,7 @@ jobs:
           GIT_REVISION=${{ github.sha }}
           EOF
       - name: Docker Compose Up
-        run: docker compose up -d --build
+        run: docker compose up -d --build db api
       - name: Attendre que l'API soit prête
         run: |
           for i in $(seq 1 30); do
