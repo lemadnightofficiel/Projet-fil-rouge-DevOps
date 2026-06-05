@@ -50,9 +50,11 @@ L'utilisateur saisit une localisation et obtient les conditions météo en temps
 | S1 | README cadrage | [X] |
 | S2 | Dockerfile(s) + DB en container | [X] |
 | S3 | docker-compose + CI vert | [X] |
-| S4 | Manifests K8s appliqués | ☐ |
-| S5 | Monitoring + post-mortem | ☐ |
-| S6 | Soutenance prête | ☐ |
+
+À venir : 
+
+Manifests K8s appliqués | ☐ |
+Monitoring + post-mortem | ☐ |
 
 ---
 
