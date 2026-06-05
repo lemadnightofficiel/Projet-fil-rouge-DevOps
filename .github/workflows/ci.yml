@@ -1,5 +1,4 @@
 name: CI
-
 on:
   push:
     branches: ["main"]
@@ -23,6 +22,7 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
+          dotnet-quality: 'preview'
       - name: Lint
         run: dotnet format ./src-api/ProjetDevOps/ProjetDevOps.csproj --verify-no-changes
 
@@ -32,14 +32,12 @@ jobs:
     needs: lint-api
     steps:
       - uses: actions/checkout@v4
-
       - name: Login GHCR
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Build and Push image API
         uses: docker/build-push-action@v6
         with:
@@ -48,20 +46,38 @@ jobs:
           tags: ghcr.io/${{ github.repository_owner }}/api:${{ github.sha }}
           build-args: GIT_SHA=${{ github.sha }}
 
+  build-and-push-front:
+    name: Build and Push Front
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Login GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and Push image Front
+        uses: docker/build-push-action@v6
+        with:
+          context: ./src-front/weathercast
+          push: ${{ github.ref == 'refs/heads/main' }}
+          tags: ghcr.io/${{ github.repository_owner }}/front:${{ github.sha }}
+          build-args: GIT_REVISION=${{ github.sha }}
+
   integration:
     name: Docker Compose Up and Tests
     runs-on: ubuntu-latest
-    needs: [build-bdd, build-and-push-api]
+    needs: [build-bdd, build-and-push-api, build-and-push-front]
     env:
       MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
       MYSQL_DATABASENAME: ${{ secrets.MYSQL_DATABASENAME }}
       MYSQL_USERNAME: ${{ secrets.MYSQL_USERNAME }}
       MYSQL_USER_PASSWORD: ${{ secrets.MYSQL_USER_PASSWORD }}
       MARIADB_CONNECTIONSTRING: ${{ secrets.MARIADB_CONNECTIONSTRING }}
-      GIT_REVISION: ${{ secrets.GIT_REVISION }}
+      GIT_REVISION: ${{ github.sha }}
     steps:
       - uses: actions/checkout@v4
-
       - name: Créer le .env
         run: |
           cat << EOF > .env
@@ -70,23 +86,22 @@ jobs:
           MYSQL_USERNAME=${MYSQL_USERNAME}
           MYSQL_USER_PASSWORD=${MYSQL_USER_PASSWORD}
           MARIADB_CONNECTIONSTRING=${MARIADB_CONNECTIONSTRING}
-          GIT_REVISION=${GIT_REVISION}
+          GIT_REVISION=${{ github.sha }}
           EOF
-
       - name: Docker Compose Up
-        run: docker compose up -d --build db api
-
-      - name: Attendre que les services soient prêts
-        run: sleep 20
-
-      - name: Test HTTP API
+        run: docker compose up -d --build
+      - name: Attendre que l'API soit prête
         run: |
-          curl -f http://localhost:3120/api/weathers || \
-          (docker compose logs api && exit 1)
-
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:3120/api/weathers && exit 0
+            echo "Attente... $i/30"
+            sleep 2
+          done
+          echo "L'API n'a pas démarré à temps"
+          docker compose logs api
+          exit 1
       - name: Vérifier les services
         run: docker compose ps
-
       - name: Docker Compose Down
         if: always()
         run: docker compose down
