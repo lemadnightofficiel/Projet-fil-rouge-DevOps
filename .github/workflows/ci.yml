@@ -74,7 +74,7 @@ jobs:
           EOF
 
       - name: Docker Compose Up
-        run: docker compose up -d --build
+        run: docker compose up -d --build db api
 
       - name: Attendre que les services soient prêts
         run: sleep 20
