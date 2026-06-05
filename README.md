@@ -1,4 +1,4 @@
-# Projet Fil Rouge DevOps : Application Météo
+# Projet Fil Rouge DevOps : WeatherCast
 
 **Équipe :** Jean-Baptiste Bodusseau, Kelyan Danis, Matthieu Caron  
 **Promo :** B3 Info  
@@ -99,8 +99,7 @@ Projet-fil-rouge-DevOps/
 ├── src-front/        # Frontend Deno
 ├── bdd/              # Scripts d'initialisation MariaDB
 ├── .github/
-│   └── workflows/    # Pipelines CI/CD
-├── k8s/              # Manifests Kubernetes (à venir S4)
+│   └── workflows/ci.yml    # Pipelines CI/CD
 ├── docker-compose.yml
 ├── .env.example
 └── README.md
